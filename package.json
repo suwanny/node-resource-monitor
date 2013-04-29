@@ -1,0 +1,32 @@
+{
+  "name": "node-resource-monitor",
+  "version": "0.0.1",
+  "description": "Monitoring system resources that consumed by a nodejs app",
+  "main": "index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "coffee-script": "1.6.2",
+    "sprintf": "0.1.1",
+    "lodash": "1.2.0",
+    "mocha": "1.9.0",
+    "should": "1.2.2"
+  },
+  "scripts": {
+    "test": "mocha -R spec --recursive test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git://github.com/suwanny/node-resource-monitor.git"
+  },
+  "keywords": [
+    "monitoring",
+    "system",
+    "resource"
+  ],
+  "author": "Soo Hwan Park",
+  "license": "MIT",
+  "readmeFilename": "README.md",
+  "gitHead": "bfcc0ca1c36ee1cf71b02298dc9fb30abd6bfd89"
+}
