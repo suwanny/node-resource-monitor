@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title> <%= title %> </title>
+  <style type="text/css">
+    body {
+      padding: 10px;
+      font: 13px Helvetica, Arial, sans-serif;
+    }
+
+    .chart {
+      width: 100%;
+      height: 100%;
+      font-size: 14px;
+      line-height: 1.2em;
+    }
+
+    .demo-container {
+      box-sizing: border-box;
+      width: 1000px;
+      height: 350px;
+      padding: 20px 15px 15px 15px;
+      margin: 15px auto 30px auto;
+      border: 1px solid #ddd;
+      background: #fff;
+      background: linear-gradient(#f6f6f6 0, #fff 50px);
+      background: -o-linear-gradient(#f6f6f6 0, #fff 50px);
+      background: -ms-linear-gradient(#f6f6f6 0, #fff 50px);
+      background: -moz-linear-gradient(#f6f6f6 0, #fff 50px);
+      background: -webkit-linear-gradient(#f6f6f6 0, #fff 50px);
+      box-shadow: 0 3px 10px rgba(0,0,0,0.15);
+      -o-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      -ms-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      -moz-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+      -webkit-box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+    }
+
+  </style>
+
+  <script language="javascript" type="text/javascript" src="/flot/jquery.js"></script>
+  <script language="javascript" type="text/javascript" src="/flot/jquery.flot.js"></script>
+  <script language="javascript" type="text/javascript" src="/flot/jquery.flot.time.js"></script>
+  <script language="javascript" type="text/javascript" src="/js/lodash.min.js"></script>
+
+  <script type="text/javascript">
+
+  $(function() {
+
+    var LocalTimeOffset = 7*60*60*1000;
+
+    function mbFormatter(val, axis) { 
+      return parseInt(val / (1024*1024), 10) + " MB";
+    }
+    
+    var optionsMemory = {
+      lines: {
+        show: true
+      },
+      points: {
+        show: false
+      },
+      xaxis: {
+        mode:"time"
+      },
+      yaxis: {
+        tickFormatter: mbFormatter
+      },
+      grid: {
+        backgroundColor: { colors: [ "#fff", "#eee" ] },
+        borderWidth: {
+          top: 1,
+          right: 1,
+          bottom: 2,
+          left: 2
+        }
+      }
+    };
+
+    var optionsCpu = {
+      lines: {
+        show: true
+      },
+      points: {
+        show: false
+      },
+      xaxis: {
+        mode:"time"
+      },
+      yaxis: {
+      }
+    };
+
+
+    function onDataReceived(series) {
+      series.timestamp  = _.map(series.timestamp, function(val){
+        return val - LocalTimeOffset;
+      });
+
+      var dataFreeMemory  = _.zip(series.timestamp, series.freeMemory);
+      var dataHeapUsed    = _.zip(series.timestamp, series.memHeapUsed);
+      var dataHeapTotal   = _.zip(series.timestamp, series.memHeapTotal);
+      var dataRss         = _.zip(series.timestamp, series.memRss);
+      // console.info(dataFreeMemory);
+      // var d1 = [];
+      $.plot("#chartMemory", [
+        { label: "Heap Used", data: dataHeapUsed },
+        { label: "Heap Total", data: dataHeapTotal },
+        { label: "Rss", data: dataRss }
+      ], optionsMemory );
+
+      var dataCpuUser   = _.zip(series.timestamp, series.cpuUser);
+      var dataCpuSys    = _.zip(series.timestamp, series.cpuSys);
+      var dataCpuIdel   = _.zip(series.timestamp, series.cpuIdle);
+
+      $.plot("#chartCpu", [
+        { label: "CPU User",  data: dataCpuUser },
+        { label: "CPU Sys",   data: dataCpuSys },
+        { label: "CPU Idle",  data: dataCpuIdel }
+      ], optionsCpu );
+    };
+
+    function fetchData() {
+      $.ajax({
+        url: '/data',
+        type: "GET",
+        dataType: "json",
+        success: onDataReceived
+      });
+    }
+
+    setInterval(fetchData, 2000);
+    fetchData();
+
+  });
+
+  </script>
+
+</head>
+<body>

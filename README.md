@@ -9,6 +9,18 @@ Monitoring system resources that consumed by a nodejs app
 
 ## How to use
 
+    var NodeResourceMonitor = require('./node_resource_monitor');
+    var monitor = new NodeResourceMonitor();
+
+    // start
+    monitor.start(1000);
+
+    // get data points
+    var data = monitor.get();
+
+    // stop
+    monitor.stop();
+
     
 
 
